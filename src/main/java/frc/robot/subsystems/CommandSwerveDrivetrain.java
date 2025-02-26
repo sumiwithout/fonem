@@ -2,10 +2,12 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.time.Period;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -16,6 +18,7 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
@@ -40,6 +43,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
+    // remove if need too
+LimelightHelpers.PoseEstimate limelightMeasurement;
+
+// private final Pigeon2 pigeon = new Pigeon2(0, "Drive Base");
+private final Pigeon2 pigeon = new Pigeon2(0);
+
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
@@ -194,6 +203,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (Utils.isSimulation()) {
             startSimThread();
         }
+        // check pistion of this line since I might have sharted 
+        // remove if need too
+        setVisionMeasurementStdDevs(VecBuilder.fill(.5, .5, 9999999));
+
         configureAutoBuilder();
     }
 
@@ -276,6 +289,24 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 );
                 m_hasAppliedOperatorPerspective = true;
             });
+            //r remove if need too
+            LimelightHelpers.SetRobotOrientation("limelight", pigeon.getYaw().getValueAsDouble(), 0, 0, 0, 0, 0); 
+            limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+            try {
+                if (limelightMeasurement != null && limelightMeasurement.pose != null) {
+                    if (limelightMeasurement.pose.getX() != 0) {
+                        addVisionMeasurement(limelightMeasurement.pose, limelightMeasurement.timestampSeconds);
+                        SmartDashboard.putBoolean("LimeLight", true);
+                    } else{
+                        SmartDashboard.putBoolean("LimeLight", false);
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("An error occurred: " + e.getMessage());
+                e.printStackTrace();
+            }
+
+            
         }
     }
 
