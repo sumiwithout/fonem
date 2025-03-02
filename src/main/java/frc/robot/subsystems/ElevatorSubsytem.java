@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.Map;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkFlexSim;
 import com.revrobotics.sim.SparkLimitSwitchSim;
@@ -12,7 +14,10 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -20,6 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Configs;
 import frc.robot.Configs.Elevatorsubsystem;
 import frc.robot.Constants.CoralSubsystemConstants.ElevatorSetpoints;
 import frc.robot.Constants.SimulationRobotConstants;
@@ -35,7 +41,12 @@ public class ElevatorSubsytem extends SubsystemBase{
             level3, 
             level4
     }
-    private SparkMax elevatormotor = new SparkMax(20, MotorType.kBrushless);
+
+    
+    
+    private SparkMax elevatormotor = new SparkMax(14, MotorType.kBrushless);
+    private SparkMax followmotor = new SparkMax(11, MotorType.kBrushless);
+
     // private SparkMax followmotor = new SparkMax(100, MotorType.kBrushless);
     private SparkClosedLoopController elactorcontorller = elevatormotor.getClosedLoopController();
     private RelativeEncoder elevatEncoder = elevatormotor.getEncoder();
@@ -74,7 +85,7 @@ public class ElevatorSubsytem extends SubsystemBase{
   }
 public ElevatorSubsytem(){
     elevatormotor.configure(Elevatorsubsystem.elevatorconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    // followmotor.configure(Elevatorsubsystem.followmotor, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    followmotor.configure(Elevatorsubsystem.followmotor, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     elevatEncoder.setPosition(0);
 
 
@@ -133,7 +144,8 @@ public void zeroTheElevatorOnLimitSwitch(){
 
 @Override
 public void periodic(){
-    moveToSetpoint();
+
+
     zeroTheElevatorOnLimitSwitch();
     zeroOnUserButton();
      SmartDashboard.putNumber("levator/Target Position", elevatorCurrentTarget);
@@ -144,7 +156,6 @@ public void periodic(){
           + SimulationRobotConstants.kMaxElevatorHeightMeters
               * (elevatEncoder.getPosition() / SimulationRobotConstants.kElevatorGearing)
               * (SimulationRobotConstants.kElevatorDrumRadius * 2.0 * Math.PI));
-
 }
 public void setCurrenttarget(int num){
     elevatorCurrentTarget = num;

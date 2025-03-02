@@ -7,25 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Testpath1"
+            "pathName": "MidScoreL4"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "L4"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "testpath2"
           }
         }
       ]
