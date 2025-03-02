@@ -54,6 +54,10 @@ public class RobotContainer {
     private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
+
+
+        // the command wont work help
+        NamedCommands.registerCommand("L4", new InstantCommand(() ->m_ElevatorSubsytem.setSetpointCommand(hightes.levcel2)));
         autoChooser = AutoBuilder.buildAutoChooser("Tests");
                 SmartDashboard.putData("Auto Mode", autoChooser);
         configureBindings();
