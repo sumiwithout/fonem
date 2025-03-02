@@ -237,6 +237,7 @@ private final Pigeon2 pigeon = new Pigeon2(0);
         } catch (Exception ex) {
             DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder", ex.getStackTrace());
         }
+        
     }
 
     /**

@@ -145,7 +145,7 @@ public void zeroTheElevatorOnLimitSwitch(){
 @Override
 public void periodic(){
 
-
+  moveToSetpoint();
     zeroTheElevatorOnLimitSwitch();
     zeroOnUserButton();
      SmartDashboard.putNumber("levator/Target Position", elevatorCurrentTarget);

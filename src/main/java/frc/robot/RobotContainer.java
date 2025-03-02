@@ -16,11 +16,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Coral;
 import frc.robot.subsystems.ElevatorSubsytem;
@@ -28,6 +30,7 @@ import frc.robot.subsystems.ElevatorSubsytem.hightes;
 
 public class RobotContainer {
       private final ElevatorSubsytem m_ElevatorSubsytem = ElevatorSubsytem.getInstance();
+      private final AlgaeSubsystem m_algaeSubsystem = AlgaeSubsystem.getinstance();
         private final Coral shooter = Coral.getinstance();
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
@@ -53,8 +56,6 @@ public class RobotContainer {
     public RobotContainer() {
         autoChooser = AutoBuilder.buildAutoChooser("Tests");
                 SmartDashboard.putData("Auto Mode", autoChooser);
-                NamedCommands.registerCommand("L4",m_ElevatorSubsytem.setSetpointCommand(hightes.level4));
-
         configureBindings();
     }
 // test test on fonem grave 
@@ -87,7 +88,7 @@ public class RobotContainer {
 
 
 
-            // shooter.setDefaultCommand(new RunCommand(()-> shooter.stopshooting(), shooter));
+            shooter.setDefaultCommand(new RunCommand(()-> shooter.stopshooting(), shooter));
 
 
 
@@ -114,9 +115,12 @@ public class RobotContainer {
         joystick.x().onTrue(m_ElevatorSubsytem.setSetpointCommand(hightes.level3));
     
         // // Y Button -> Elevator/Arm to level 4 position
-        // joystick.y().onTrue(m_ElevatorSubsytem.setSetpointCommand(hightes.level4));
-        //   joystick.rightTrigger().whileTrue(new RunCommand(()-> shooter.shooting(), shooter));
-        //   joystick.leftTrigger().whileTrue(new RunCommand(()-> shooter.intake(), shooter));
+        joystick.y().onTrue(m_ElevatorSubsytem.setSetpointCommand(hightes.level4));
+
+          joystick.rightTrigger().whileTrue(new RunCommand(()-> shooter.shooting(), shooter));
+          joystick.leftTrigger().whileTrue(new RunCommand(()-> shooter.intake(), shooter));
+        joystick.leftBumper().onTrue(m_algaeSubsystem.kickalgeCommand());
+        joystick.rightBumper().onTrue(m_algaeSubsystem.reverseIntakeCommand());
 
     }
     public double getSimulationTotalCurrentDraw() {
