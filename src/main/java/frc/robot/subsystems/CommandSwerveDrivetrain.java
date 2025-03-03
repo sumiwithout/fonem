@@ -207,10 +207,10 @@ private final Pigeon2 pigeon = new Pigeon2(0);
         // remove if need too
         setVisionMeasurementStdDevs(VecBuilder.fill(.5, .5, 9999999));
 
-        configureAutoBuilder();
+        // configureAutoBuilder();
     }
 
-    private void configureAutoBuilder() {
+    public void configureAutoBuilder() {
         try {
             var config = RobotConfig.fromGUISettings();
             AutoBuilder.configure(
