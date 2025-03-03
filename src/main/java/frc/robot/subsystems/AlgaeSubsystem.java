@@ -48,20 +48,7 @@ private static final AlgaeSubsystem algears = new AlgaeSubsystem();
 
   // Simulation setup and variables
   private DCMotor armMotorModel = DCMotor.getNeoVortex(1);
-  private SparkFlexSim armMotorSim;
-  private final SingleJointedArmSim m_intakeSim =
-      new SingleJointedArmSim(
-          armMotorModel,
-          SimulationRobotConstants.kIntakeReduction,
-          SingleJointedArmSim.estimateMOI(
-              SimulationRobotConstants.kIntakeLength, SimulationRobotConstants.kIntakeMass),
-          SimulationRobotConstants.kIntakeLength,
-          SimulationRobotConstants.kIntakeMinAngleRads,
-          SimulationRobotConstants.kIntakeMaxAngleRads,
-          true,
-          SimulationRobotConstants.kIntakeMinAngleRads,
-          0.0,
-          0.0);
+  
 
   // Mechanism2d setup for subsytem
   private final Mechanism2d m_mech2d = new Mechanism2d(50, 50);
@@ -140,7 +127,7 @@ private static final AlgaeSubsystem algears = new AlgaeSubsystem();
    *
    * <p>This will also update the idle state to stow the arm when this command is not running.
    */
-  public Command reverseIntakeCommand() {
+  public Command backhome() {
     return this.run(
         () -> {
           setIntakePosition(0);
@@ -181,25 +168,5 @@ private static final AlgaeSubsystem algears = new AlgaeSubsystem();
   }
 
   /** Get the current drawn by each simulation physics model */
-  public double getSimulationCurrentDraw() {
-    return m_intakeSim.getCurrentDrawAmps();
-  }
-
-  @Override
-  public void simulationPeriodic() {
-    // This method will be called once per scheduler run during simulation
-    m_intakeSim.setInput(armMotorSim.getAppliedOutput() * RobotController.getBatteryVoltage());
-
-    // Next, we update it. The standard loop time is 20ms.
-    m_intakeSim.update(0.020);
-
-    // Iterate the arm SPARK simulation
-    armMotorSim.iterate(
-        Units.radiansPerSecondToRotationsPerMinute(
-            m_intakeSim.getVelocityRadPerSec() * SimulationRobotConstants.kArmReduction),
-        RobotController.getBatteryVoltage(),
-        0.02);
-
-    // SimBattery is updated in Robot.java
-  }
+ 
 }

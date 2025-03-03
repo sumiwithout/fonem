@@ -57,7 +57,6 @@ public class RobotContainer {
 
 
         // the command wont work help
-        NamedCommands.registerCommand("L4", new InstantCommand(() ->m_ElevatorSubsytem.setSetpointCommand(hightes.levcel2)));
         autoChooser = AutoBuilder.buildAutoChooser("Tests");
                 SmartDashboard.putData("Auto Mode", autoChooser);
         configureBindings();
@@ -68,26 +67,26 @@ public class RobotContainer {
         
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
-        // drivetrain.setDefaultCommand(
+        drivetrain.setDefaultCommand(
         //     // Drivetrain will execute this command periodically
-        //     drivetrain.applyRequest(() ->
-        //         drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-        //             .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-        //             .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-        //     )
-        // );
+            drivetrain.applyRequest(() ->
+                drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+            )
+        );
 
-        // joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        // joystick.b().whileTrue(drivetrain.applyRequest(() ->
-        //     point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
-        // ));
+        joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        joystick.b().whileTrue(drivetrain.applyRequest(() ->
+            point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
+        ));
 
-        // joystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
-        //     forwardStraight.withVelocityX(0.5).withVelocityY(0))
-        // );
-        // joystick.pov(180).whileTrue(drivetrain.applyRequest(() ->
-        //     forwardStraight.withVelocityX(-0.5).withVelocityY(0))
-        // );
+        joystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(0.5).withVelocityY(0))
+        );
+        joystick.pov(180).whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(-0.5).withVelocityY(0))
+        );
 
 
 
@@ -106,10 +105,9 @@ public class RobotContainer {
         // joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         // // reset the field-centric heading on left bumper press
-        // joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         drivetrain.registerTelemetry(logger::telemeterize);
-
 
         joystick.b().onTrue(m_ElevatorSubsytem.setSetpointCommand(hightes.stattion));
         // A Button -> Elevator/Arm to level 2 position
@@ -121,10 +119,10 @@ public class RobotContainer {
         // // Y Button -> Elevator/Arm to level 4 position
         joystick.y().onTrue(m_ElevatorSubsytem.setSetpointCommand(hightes.level4));
 
-          joystick.rightTrigger().whileTrue(new RunCommand(()-> shooter.shooting(), shooter));
-          joystick.leftTrigger().whileTrue(new RunCommand(()-> shooter.intake(), shooter));
+        joystick.rightTrigger().whileTrue(new RunCommand(()-> shooter.shooting(), shooter));
+        joystick.leftTrigger().whileTrue(new RunCommand(()-> shooter.intake(), shooter));
         joystick.leftBumper().onTrue(m_algaeSubsystem.kickalgeCommand());
-        joystick.rightBumper().onTrue(m_algaeSubsystem.reverseIntakeCommand());
+        joystick.rightBumper().onTrue(m_algaeSubsystem.backhome());
 
     }
     public double getSimulationTotalCurrentDraw() {
@@ -133,6 +131,7 @@ public class RobotContainer {
       }
 
     public Command getAutonomousCommand() {
+
         /* Run the path selected from the auto chooser */
         return autoChooser.getSelected();
     }
