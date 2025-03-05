@@ -28,11 +28,11 @@ public final class Constants {
     public static final int kIntakeMotorCanId = 2;
 
     public static final class ElevatorSetpoints {
-      public static final int kFeederStation = 0;
-      public static final int kLevel1 = 0;
-      public static final int kLevel2 = 20;
-      public static final int kLevel3 = 30;
-      public static final int kLevel4 = 40;
+      public static final double kFeederStation = 0;
+      public static final double kLevel1 = 15;
+      public static final double kLevel2 = 12;
+      public static final double kLevel3 = 40;
+      public static final double kLevel4 = 86;
     }
     public static final class SimulationRobotConstants {
       public static final double kPixelsPerMeter = 20;

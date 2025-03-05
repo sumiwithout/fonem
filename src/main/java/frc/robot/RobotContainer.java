@@ -20,17 +20,18 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Coral;
 import frc.robot.subsystems.ElevatorSubsytem;
+import frc.robot.subsystems.HangSubsystem;
 import frc.robot.subsystems.ElevatorSubsytem.hightes;
 
 public class RobotContainer {
       private final ElevatorSubsytem m_ElevatorSubsytem = ElevatorSubsytem.getInstance();
       private final AlgaeSubsystem m_algaeSubsystem = AlgaeSubsystem.getinstance();
+      private final HangSubsystem m_hangSubsystem = HangSubsystem.getinstance();
         private final Coral shooter = Coral.getinstance();
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
@@ -47,17 +48,17 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final CommandXboxController joystick = new CommandXboxController(0);
+    private final CommandXboxController joystick2 = new CommandXboxController(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
-
-
-        // the command wont work help
         autoChooser = AutoBuilder.buildAutoChooser("Tests");
                 SmartDashboard.putData("Auto Mode", autoChooser);
+                NamedCommands.registerCommand("L4", m_algaeSubsystem.kickalgeCommand() ); 
+
         configureBindings();
     }
 // test test on fonem grave 
@@ -91,7 +92,7 @@ public class RobotContainer {
 
 
             shooter.setDefaultCommand(new RunCommand(()-> shooter.stopshooting(), shooter));
-
+            
 
 
 
@@ -108,20 +109,22 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
-        joystick.b().onTrue(m_ElevatorSubsytem.setSetpointCommand(hightes.stattion));
+        joystick2.b().onTrue(m_ElevatorSubsytem.setSetpointCommand(hightes.stattion));
+
         // A Button -> Elevator/Arm to level 2 position
-        joystick.a().onTrue(m_ElevatorSubsytem.setSetpointCommand(hightes.levcel2));
+        joystick2.a().onTrue(m_ElevatorSubsytem.setSetpointCommand(hightes.levcel2));
     
         // X Button -> Elevator/Arm to level 3 position
-        joystick.x().onTrue(m_ElevatorSubsytem.setSetpointCommand(hightes.level3));
+        joystick2.x().onTrue(m_ElevatorSubsytem.setSetpointCommand(hightes.level3));
     
         // // Y Button -> Elevator/Arm to level 4 position
-        joystick.y().onTrue(m_ElevatorSubsytem.setSetpointCommand(hightes.level4));
-
-        joystick.rightTrigger().whileTrue(new RunCommand(()-> shooter.shooting(), shooter));
-        joystick.leftTrigger().whileTrue(new RunCommand(()-> shooter.intake(), shooter));
-        joystick.leftBumper().onTrue(m_algaeSubsystem.kickalgeCommand());
-        joystick.rightBumper().onTrue(m_algaeSubsystem.backhome());
+        joystick2.y().onTrue(m_ElevatorSubsytem.setSetpointCommand(hightes.level4));
+        
+        joystick2.rightTrigger().whileTrue(new RunCommand(()-> shooter.shooting(), shooter));
+        joystick2.leftTrigger().whileTrue(new RunCommand(()-> shooter.intake(), shooter));
+        joystick2.leftBumper().onTrue(m_algaeSubsystem.kickalgeCommand());
+        joystick2.rightBumper().onTrue(m_algaeSubsystem.backhome());
+        // joystick2.start().onTrue(m_hangSubsystem.hang());
 
     }
     public double getSimulationTotalCurrentDraw() {

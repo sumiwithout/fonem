@@ -37,6 +37,9 @@ private static final AlgaeSubsystem algears = new AlgaeSubsystem();
       new SparkMax(10, MotorType.kBrushless);
   private SparkClosedLoopController armController = armMotor.getClosedLoopController();
   private RelativeEncoder armEncoder = armMotor.getEncoder();
+// change the intakespark max to the correct deviceId
+  private SparkMax intakemotor = new SparkMax(21, MotorType.kBrushless);
+  
 
   // Initialize intake SPARK. We will use open loop control for this so we don't need a closed loop
   // controller like above.
@@ -81,7 +84,10 @@ private static final AlgaeSubsystem algears = new AlgaeSubsystem();
      * the SPARK loses power. This is useful for power cycles that may occur
      * mid-operation.
      */
-   
+    intakemotor.configure(
+      Configs.AlgaeSubsystem.intakeConfig,
+      ResetMode.kResetSafeParameters,
+      PersistMode.kPersistParameters);
     armMotor.configure(
         Configs.AlgaeSubsystem.armConfig,
         ResetMode.kResetSafeParameters,
@@ -117,10 +123,23 @@ private static final AlgaeSubsystem algears = new AlgaeSubsystem();
   public Command kickalgeCommand() {
     return this.run(
         () -> {
+          setIntakePower(-1);
+          setIntakePosition(15.11903190612793);
+        });
+  }
+
+  public Command holdalge() {
+    return this.run(
+        () -> {
+          setIntakePower(-.1);
           setIntakePosition(16.11903190612793);
         });
   }
 
+
+  private void setIntakePower(double power) {
+    intakemotor.set(power);
+  }
   /**
    * Command to run the algae intake in reverse. This will extend the arm to its "hold" position and
    * run the motor at its "reverse" power to eject the ball.
@@ -130,6 +149,7 @@ private static final AlgaeSubsystem algears = new AlgaeSubsystem();
   public Command backhome() {
     return this.run(
         () -> {
+          setIntakePower(0);
           setIntakePosition(0);
         });
   }
@@ -159,6 +179,8 @@ private static final AlgaeSubsystem algears = new AlgaeSubsystem();
 
     // Display subsystem values
     SmartDashboard.putNumber("Algae/Arm/Position", armEncoder.getPosition());
+    SmartDashboard.putNumber("Algae/Intake/Applied Output", intakemotor.getAppliedOutput());
+
 
     // Update mechanism2d
     intakePivotMechanism.setAngle(

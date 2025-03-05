@@ -70,8 +70,8 @@ state current = state.IDLE;
       followshoot.set(-.2);
       break;
       case intake:
-      coralshoot.set(.1);
-      followshoot.set(.1);
+      coralshoot.set(-.1);
+      followshoot.set(-.1);
       break;
      case IDLE:
 

@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "Scorepath3left"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "L4"
