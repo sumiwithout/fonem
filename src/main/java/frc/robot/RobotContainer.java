@@ -6,6 +6,8 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.io.IOException;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
@@ -54,11 +56,10 @@ public class RobotContainer {
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
 
-    public RobotContainer() {
+    public RobotContainer(){
         autoChooser = AutoBuilder.buildAutoChooser("Tests");
                 SmartDashboard.putData("Auto Mode", autoChooser);
-                NamedCommands.registerCommand("L4", m_algaeSubsystem.kickalgeCommand() ); 
-
+                registerNamedCommands();
         configureBindings();
     }
 // test test on fonem grave 
@@ -131,6 +132,10 @@ public class RobotContainer {
         // for each subsystem with simulation
         return m_ElevatorSubsytem.getSimulationCurrentDraw();
       }
+      public void registerNamedCommands(){
+        NamedCommands.registerCommand("L4", new InstantCommand(() ->m_ElevatorSubsytem.setSetpointCommand(hightes.levcel2)));
+      }
+    
 
     public Command getAutonomousCommand() {
 

@@ -212,7 +212,7 @@ private final Pigeon2 pigeon = new Pigeon2(0);
         // configureAutoBuilder();
     }
 
-    public void configureAutoBuilder() {
+    private void configureAutoBuilder() {
         try {
             var config = RobotConfig.fromGUISettings();
             AutoBuilder.configure(
