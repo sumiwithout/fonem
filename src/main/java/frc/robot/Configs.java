@@ -9,6 +9,7 @@ import com.revrobotics.spark.config.LimitSwitchConfig.Type;
 
 
 public final class Configs {
+  
         public static double pvalue =.08;
         
         public static double dvale = 0.05;

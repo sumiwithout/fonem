@@ -120,19 +120,33 @@ private static final AlgaeSubsystem algears = new AlgaeSubsystem();
    *
    * <p>This will also update the idle state to hold onto the ball when this command is not running.
    */
-  public Command kickalgeCommand() {
+  public Command removefromreef() {
     return this.run(
         () -> {
-          setIntakePower(-1);
-          setIntakePosition(15.11903190612793);
+          setIntakePower(-.4);
+          setIntakePosition(14.11903190612793);
+        });
+  }
+  public Command pickfromfloor() {
+    return this.run(
+        () -> {
+          setIntakePower(1);
+          setIntakePosition(14.11903190612793);
         });
   }
 
-  public Command holdalge() {
+  public Command inprocessor() {
     return this.run(
         () -> {
-          setIntakePower(-.1);
-          setIntakePosition(16.11903190612793);
+          setIntakePower(.4);
+          setIntakePosition(17.11903190612793);
+        });
+  }
+  public Command shootprocesor() {
+    return this.run(
+        () -> {
+          setIntakePower(-.4);
+          setIntakePosition(17.11903190612793);
         });
   }
 
