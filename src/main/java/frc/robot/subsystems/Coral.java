@@ -4,12 +4,13 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.ColorSensorV3;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
-import edu.wpi.first.wpilibj.SerialPort.Port;
+import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -35,9 +36,11 @@ state current = state.IDLE;
 
   private SparkMax coralshoot = new SparkMax(12, MotorType.kBrushless);
   private SparkMax followshoot = new SparkMax(9, MotorType.kBrushless);
+  private ColorSensorV3 yes;
   // private Rev2mDistanceSensor distance = new Rev2mDistanceSensor(Port.kOnboard);
   /** Creates a new shooter. */
   public Coral() {
+    yes = new ColorSensorV3(Port.kOnboard);
  coralshoot.configure(shoot.coralshoot, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     followshoot.configure(shoot.followshoot, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 

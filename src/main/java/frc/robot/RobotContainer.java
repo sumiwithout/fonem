@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.*;
 import java.io.IOException;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -32,6 +33,7 @@ import frc.robot.subsystems.HangSubsystem;
 import frc.robot.subsystems.ElevatorSubsytem.hightes;
 
 public class RobotContainer {
+
       private final ElevatorSubsytem m_ElevatorSubsytem = ElevatorSubsytem.getInstance();
       private final AlgaeSubsystem m_algaeSubsystem = AlgaeSubsystem.getinstance();
 
@@ -56,16 +58,18 @@ public class RobotContainer {
     private final CommandXboxController joystick2 = new CommandXboxController(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
 
     public RobotContainer(){
+      drivetrain.configNeutralMode(NeutralModeValue.Coast);
         NamedCommands.registerCommand("shoot", new InstantCommand(()-> shooter.setpower(-.2,-.1)));
         NamedCommands.registerCommand("timmer",  level1shoot.withTimeout(5));
 
         NamedCommands.registerCommand("stop", new InstantCommand(()-> shooter.stopshooting()));
         NamedCommands.registerCommand("L2", new InstantCommand(() ->m_ElevatorSubsytem.setSetpointCommand(hightes.levcel2)));
-
+        
         autoChooser = AutoBuilder.buildAutoChooser("Tests");
                 SmartDashboard.putData("Auto Mode", autoChooser);
 
@@ -82,13 +86,15 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
         //     // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-joystick.getLeftY() * MaxSpeed*multipler) // Drive forward with negative Y (forward)
-                    .withVelocityY(-joystick.getLeftX() * MaxSpeed*multipler) // Drive left with negative X (left)
-                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate*multipler) // Drive counterclockwise with negative X (left)
+                drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
-        
+        drivetrain.setDefaultCommand(new InstantCommand(() -> setMaxSpeed(MaxSpeed * .85)));
         joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
+
+        joystick.x().whileTrue(new InstantCommand(() -> setMaxSpeed(MaxSpeed * 1)));
         // joystick.b().whileTrue(drivetrain.applyRequest(() ->
         //     point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
         // ));
@@ -152,7 +158,9 @@ public class RobotContainer {
       
 
       }
-    
+      public void setMaxSpeed(double newSpeed) {
+        MaxSpeed = newSpeed;
+    }
 
     public Command getAutonomousCommand() {
 
