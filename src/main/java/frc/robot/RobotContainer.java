@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.*;
 import java.io.IOException;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -22,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.commands.ShootforAuto;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -31,10 +33,13 @@ import frc.robot.subsystems.HangSubsystem;
 import frc.robot.subsystems.ElevatorSubsytem.hightes;
 
 public class RobotContainer {
+
       private final ElevatorSubsytem m_ElevatorSubsytem = ElevatorSubsytem.getInstance();
       private final AlgaeSubsystem m_algaeSubsystem = AlgaeSubsystem.getinstance();
-      private final HangSubsystem m_hangSubsystem = HangSubsystem.getinstance();
+
+      
         private final Coral shooter = Coral.getinstance();
+       private ShootforAuto level1shoot = new ShootforAuto();
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
@@ -48,24 +53,34 @@ public class RobotContainer {
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
-
+    private double multipler = .85;
     private final CommandXboxController joystick = new CommandXboxController(0);
     private final CommandXboxController joystick2 = new CommandXboxController(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
 
     public RobotContainer(){
+      drivetrain.configNeutralMode(NeutralModeValue.Coast);
+        NamedCommands.registerCommand("shoot", new InstantCommand(()-> shooter.setpower(-.2,-.1)));
+        NamedCommands.registerCommand("timmer",  level1shoot.withTimeout(5));
+
+        NamedCommands.registerCommand("stop", new InstantCommand(()-> shooter.stopshooting()));
+        NamedCommands.registerCommand("L2", new InstantCommand(() ->m_ElevatorSubsytem.setSetpointCommand(hightes.levcel2)));
+        
         autoChooser = AutoBuilder.buildAutoChooser("Tests");
                 SmartDashboard.putData("Auto Mode", autoChooser);
-                registerNamedCommands();
-        configureBindings();
+
+                configureBindings();
     }
-// test test on fonem grave 
-//alright it works
+
     private void configureBindings() {
         
+
+
+
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
@@ -76,27 +91,31 @@ public class RobotContainer {
                     .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
-
+        drivetrain.setDefaultCommand(new InstantCommand(() -> setMaxSpeed(MaxSpeed * .85)));
         joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        joystick.b().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
-        ));
 
+<<<<<<< HEAD
         joystick.povRight().whileTrue(new MoveAlgaeArmManually(0.2));
 		joystick.povLeft().whileTrue(new MoveAlgaeArmManually(-0.1));
 
         joystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
+
+        joystick.x().whileTrue(new InstantCommand(() -> setMaxSpeed(MaxSpeed * 1)));
+        // joystick.b().whileTrue(drivetrain.applyRequest(() ->
+        //     point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
+        // ));
+
+        joystick.pov(270).whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(0).withVelocityY(0.5))
+>>>>>>> 7e8f904fe53fe5e59ef7c73f028ffd744936a162
         );
-        joystick.pov(180).whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(-0.5).withVelocityY(0))
+        joystick.pov(90).whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(0).withVelocityY(-.5))
         );
+        shooter.setDefaultCommand(new RunCommand(()-> shooter.stopshooting(), shooter));
+          
 
-
-
-
-            shooter.setDefaultCommand(new RunCommand(()-> shooter.stopshooting(), shooter));
-            
 
 
 
@@ -108,37 +127,48 @@ public class RobotContainer {
         // joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         // joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
+
+
+
         // // reset the field-centric heading on left bumper press
-        joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
+
+
+        // player one type shit
+        joystick.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        joystick.rightBumper().onTrue(m_algaeSubsystem.removefromreef());
+        joystick.leftBumper().whileTrue(new RunCommand(()-> shooter.level1shoot(), shooter));
+        joystick.rightTrigger().whileTrue(new RunCommand(()-> shooter.shooting(), shooter));
+        joystick.leftTrigger().whileTrue(new RunCommand(()-> shooter.intake(), shooter));
         drivetrain.registerTelemetry(logger::telemeterize);
+        joystick.b().onTrue(m_algaeSubsystem.backhome());
 
+
+
+
+        // player 2
         joystick2.b().onTrue(m_ElevatorSubsytem.setSetpointCommand(hightes.stattion));
-
-        // A Button -> Elevator/Arm to level 2 position
         joystick2.a().onTrue(m_ElevatorSubsytem.setSetpointCommand(hightes.levcel2));
-    
-        // X Button -> Elevator/Arm to level 3 position
         joystick2.x().onTrue(m_ElevatorSubsytem.setSetpointCommand(hightes.level3));
-    
-        // // Y Button -> Elevator/Arm to level 4 position
         joystick2.y().onTrue(m_ElevatorSubsytem.setSetpointCommand(hightes.level4));
-        
-        joystick2.rightTrigger().whileTrue(new RunCommand(()-> shooter.shooting(), shooter));
-        joystick2.leftTrigger().whileTrue(new RunCommand(()-> shooter.intake(), shooter));
-        joystick2.leftBumper().onTrue(m_algaeSubsystem.kickalgeCommand());
         joystick2.rightBumper().onTrue(m_algaeSubsystem.backhome());
-        // joystick2.start().onTrue(m_hangSubsystem.hang());
+        joystick2.leftBumper().onTrue(m_algaeSubsystem.removefromreef());
+        joystick2.rightTrigger().onTrue(m_algaeSubsystem.inprocessor());
+        joystick2.leftTrigger().onTrue(m_algaeSubsystem.shootprocesor());
 
     }
+
     public double getSimulationTotalCurrentDraw() {
         // for each subsystem with simulation
         return m_ElevatorSubsytem.getSimulationCurrentDraw();
       }
       public void registerNamedCommands(){
-        NamedCommands.registerCommand("L4", new InstantCommand(() ->m_ElevatorSubsytem.setSetpointCommand(hightes.levcel2)));
+      
+
       }
-    
+      public void setMaxSpeed(double newSpeed) {
+        MaxSpeed = newSpeed;
+    }
 
     public Command getAutonomousCommand() {
 

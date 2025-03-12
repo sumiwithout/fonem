@@ -12,6 +12,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
@@ -19,10 +20,6 @@ import frc.robot.Configs;
 public class HangSubsystem extends SubsystemBase {
 // find number
 
-private static final HangSubsystem hang = new HangSubsystem();
-  public static final HangSubsystem getinstance(){
-    return hang;
-  }
   private final SparkMax hangmotor = new SparkMax(18, MotorType.kBrushless);
   private SparkClosedLoopController hanvontorller = hangmotor.getClosedLoopController();
   private RelativeEncoder hangEncoder = hangmotor.getEncoder();
@@ -36,6 +33,8 @@ hangEncoder.setPosition(0);
   public void periodic() {
   
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("Hang",hangEncoder.getPosition());
+    
   }
 
 
@@ -55,7 +54,7 @@ hangEncoder.setPosition(0);
   public Command hang() {
     return this.run(
         () -> {
-          sethang(20);
+          sethang(35.618717193603516);
         });
   }
 }

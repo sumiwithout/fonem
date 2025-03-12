@@ -9,12 +9,6 @@
           "data": {
             "pathName": "MidScoreL4"
           }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "L4"
-          }
         }
       ]
     }
