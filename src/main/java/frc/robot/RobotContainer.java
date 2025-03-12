@@ -82,6 +82,9 @@ public class RobotContainer {
             point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
         ));
 
+        joystick.povRight().whileTrue(new MoveAlgaeArmManually(0.2));
+		joystick.povLeft().whileTrue(new MoveAlgaeArmManually(-0.1));
+
         joystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
         );
